@@ -1,9 +1,10 @@
-import testFunc from './another';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-console.log('Kerri loves to bike outside. Everyday!');
+import App from './App';
 
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('button').addEventListener('click', () => {
-    document.getElementById('demo').innerHTML = Date();
-  });
-});
+const title = "React is cool. I'm using it on top of Webpack and Babel.";
+
+ReactDOM.render(<App title={title} />, document.getElementById('app'));
+
+module.hot.accept();
