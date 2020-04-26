@@ -10,6 +10,9 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 const reducer = function (state = {}, action) {
+  if ('USER_NAME' === action.type) {
+    return action.payload;
+  }
   return state;
 };
 
