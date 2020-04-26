@@ -1,6 +1,7 @@
 import testFunc from './another';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import logger from 'redux-logger';
 
 const initialState = {
   loading: false,
@@ -8,7 +9,7 @@ const initialState = {
   posts: [],
   error: null
 };
-const middleware = applyMiddleware(thunk);
+const middleware = applyMiddleware(thunk, logger);
 
 console.log('Kerri loves to bike outside. Everyday!');
 
