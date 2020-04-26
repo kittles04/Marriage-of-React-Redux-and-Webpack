@@ -1,5 +1,14 @@
 import testFunc from './another';
-import { createStore, combineReducers } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+
+const initialState = {
+  loading: false,
+  loaded: false,
+  posts: [],
+  error: null
+};
+const middleware = applyMiddleware(thunk);
 
 console.log('Kerri loves to bike outside. Everyday!');
 
@@ -9,37 +18,30 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-const reducerEmployee = (state = {}, action) => {
+const reducer = (state = {}, action) => {
   switch (action.type) {
-    case 'TEAM_MEMBER': {
-      state = { ...state, employee: action.payload };
+    case 'LOADING': {
+      state = { ...state, loading: true };
       break;
     }
-    case 'POSITION': {
-      state = { ...state, position: action.payload };
+    case 'LOADED': {
+      state = {
+        ...state,
+        loaded: true,
+        loading: false,
+        posts: action.payload
+      };
+      break;
+    }
+    case 'ERROR': {
+      state = { ...state, loading: false, error: action.payload };
       break;
     }
   }
   return state;
 };
 
-const reducerEmployeeInterests = (state = {}, action) => {
-  switch (action.type) {
-    case 'HOBBIES': {
-      state = { ...state, hobbies: action.payload };
-      break;
-    }
-  }
-  return state;
-};
-
-//here we combine reducers before passing them to the store
-const reducers = combineReducers({
-  employee: reducerEmployee,
-  interests: reducerEmployeeInterests
-});
-
-const store = createStore(reducers);
+const store = createStore(reducer, initialState, middleware);
 
 //subscribe to store
 store.subscribe(() => {
@@ -62,17 +64,17 @@ function getPosition() {
   };
 }
 
-function getInterests() {
-  return {
-    type: 'HOBBIES',
-    payload: 'Running, Hiking, Biking, Lifting, Learning, Reading, Writing'
-  };
-}
+store.dispatch((dispatch) => {
+  dispatch({ type: 'LOADING' });
 
-store.dispatch(getTeamMember());
+  fetch('https://jsonplaceholder.typicode.com/posts')
+    .then((response) => response.json())
+    .then((jsonData) => {
+      dispatch({ type: 'LOADED', payload: jsonData });
+    })
+    .catch((err) => {
+      dispatch({ type: 'ERROR', payload: error });
+    });
+});
 
 //dispatch action to reducer function
-
-store.dispatch(getPosition());
-
-store.dispatch(getInterests());
