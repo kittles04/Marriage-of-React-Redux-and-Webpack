@@ -1,15 +1,13 @@
-import testFunc from './another';
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import logger from 'redux-logger';
+import { createStore } from 'redux';
+import todoApp from './components/reducers';
+import {
+  addTodo,
+  toggleTodo,
+  setVisibilityFilter,
+  VisibilityFilters
+} from './components/actions';
 
-const initialState = {
-  loading: false,
-  loaded: false,
-  posts: [],
-  error: null
-};
-const middleware = applyMiddleware(thunk, logger);
+const store = createStore(todoApp);
 
 console.log('Kerri loves to bike outside. Everyday!');
 
@@ -19,63 +17,19 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-const reducer = (state = {}, action) => {
-  switch (action.type) {
-    case 'LOADING': {
-      state = { ...state, loading: true };
-      break;
-    }
-    case 'LOADED': {
-      state = {
-        ...state,
-        loaded: true,
-        loading: false,
-        posts: action.payload
-      };
-      break;
-    }
-    case 'ERROR': {
-      state = { ...state, loading: false, error: action.payload };
-      break;
-    }
-  }
-  return state;
-};
+//Log the initial state
+console.log(store.getState());
 
-const store = createStore(reducer, initialState, middleware);
+//Every time the state changes, log it
+const unsubscribe = store.subscribe(() => console.log(store.getState()));
 
-//subscribe to store
-store.subscribe(() => {
-  console.warn('My store has changed', store.getState());
-});
+//Dispatch some actions
+store.dispatch(addTodo('Learn about actions'));
+store.dispatch(addTodo('Learn about reducers'));
+store.dispatch(addTodo('Learn about store'));
+store.dispatch(toggleTodo(0));
+store.dispatch(toggleTodo(1));
+store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETED));
 
-//action creator function
-
-function getTeamMember() {
-  return {
-    type: 'TEAM_MEMBER',
-    payload: 'Kerri Walker'
-  };
-}
-
-function getPosition() {
-  return {
-    type: 'POSITION',
-    payload: 'Software Developer'
-  };
-}
-
-store.dispatch((dispatch) => {
-  dispatch({ type: 'LOADING' });
-
-  fetch('https://jsonplaceholder.typicode.com/posts')
-    .then((response) => response.json())
-    .then((jsonData) => {
-      dispatch({ type: 'LOADED', payload: jsonData });
-    })
-    .catch((err) => {
-      dispatch({ type: 'ERROR', payload: error });
-    });
-});
-
-//dispatch action to reducer function
+//stop listening to updates
+unsubscribe();
